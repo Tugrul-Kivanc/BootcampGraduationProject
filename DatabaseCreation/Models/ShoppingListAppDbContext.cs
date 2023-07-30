@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DatabaseCreation
+namespace DatabaseCreation.Models
 {
     internal class ShoppingListAppDbContext : DbContext
     {
