@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DatabaseCreation.Models
+namespace DatabaseCreation
 {
-    internal class ShoppingListAppDbContext : DbContext
+    public class ShoppingListAppDbContext : DbContext
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

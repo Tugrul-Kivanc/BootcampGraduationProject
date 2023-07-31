@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DatabaseCreation.Models
+namespace DatabaseCreation
 {
     public class User
     {
@@ -12,6 +12,7 @@ namespace DatabaseCreation.Models
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
+        public bool IsAdmin { get; set; } = false;
         public ICollection<ShoppingList> ShoppingLists { get; set; } = new HashSet<ShoppingList>();
     }
 }
