@@ -1,0 +1,28 @@
+﻿@model IEnumerable<ShoppingListModel.Models.ShoppingList>
+
+@{
+    ViewData["Title"] = "Shopping Lists";
+}
+
+<h1>Shopping Lists</h1>
+
+<p>
+    <a asp-action="CreateList">Create New</a>
+</p>
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShoppingListName)
+                </td>
+                <td>
+                    <a asp-action="EditShoppingList" asp-route-id="@item.ShoppingListId">Edit</a> |
+                    <a asp-action="DeleteShoppingList" asp-route-id="@item.ShoppingListId">Delete</a> |
+                    <a asp-action="Shop" asp-route-id="@item.ShoppingListId">Start Shopping</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

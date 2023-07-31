@@ -1,32 +1,51 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShoppingListApp.Models;
+using Microsoft.EntityFrameworkCore;
+using ShoppingListModel.Models;
 using System.Diagnostics;
 
 namespace ShoppingListApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        ShoppingListAppDbContext context;
+        public HomeController()
         {
-            _logger = logger;
+            context = new ShoppingListAppDbContext();
         }
 
-        public IActionResult Index()
+        public IActionResult ShoppingLists(int id) // Takes User Id
+        {
+            var shoppingLists = context.ShoppingLists.Where(b => b.UserId == id);
+            return View(shoppingLists);
+        }
+        public IActionResult Login()
         {
             return View();
         }
-
-        public IActionResult Privacy()
+        public IActionResult Register()
         {
             return View();
         }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult AdminPanel()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
+        }
+        public IActionResult CreateList()
+        {
+            return View();
+        }
+        public IActionResult Shop()
+        {
+            return View();
+        }
+        public IActionResult EditShoppingList(int id) // Takes Shopping List Id
+        {
+            var shoppingListDetails = context.ShoppingListDetails.Include(a => a.Product).Where(b => b.ShoppingListId == id).ToList();
+            return View(shoppingListDetails);
+        }
+        public IActionResult DeleteShoppingList()
+        {
+            return View();
         }
     }
 }
