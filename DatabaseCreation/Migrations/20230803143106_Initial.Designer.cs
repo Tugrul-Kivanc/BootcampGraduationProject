@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DatabaseCreation.Migrations
 {
     [DbContext(typeof(ShoppingListAppDbContext))]
-    [Migration("20230730093654_Initial")]
+    [Migration("20230803143106_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -103,7 +103,6 @@ namespace DatabaseCreation.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -134,6 +133,9 @@ namespace DatabaseCreation.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -148,7 +150,7 @@ namespace DatabaseCreation.Migrations
 
                     b.ToTable("User", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Password", "LEN([Password]) > 15");
+                            t.HasCheckConstraint("CK_Password", "LEN([Password]) > 7");
                         });
                 });
 

@@ -15,7 +15,7 @@ namespace DatabaseCreation.Configurations
             builder.Property(a => a.Name).HasMaxLength(30);
             builder.Property(a => a.Password).HasMaxLength(128);
 
-            builder.HasCheckConstraint("CK_Password", "LEN([Password]) > 15").ToTable("User");
+            builder.HasCheckConstraint("CK_Password", "LEN([Password]) > 7").ToTable("User");
         }
     }
 }

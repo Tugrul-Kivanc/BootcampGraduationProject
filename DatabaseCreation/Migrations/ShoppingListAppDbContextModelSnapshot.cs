@@ -147,7 +147,7 @@ namespace DatabaseCreation.Migrations
 
                     b.ToTable("User", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Password", "LEN([Password]) > 15");
+                            t.HasCheckConstraint("CK_Password", "LEN([Password]) > 7");
                         });
                 });
 

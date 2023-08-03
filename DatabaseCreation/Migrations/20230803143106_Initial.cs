@@ -31,12 +31,13 @@ namespace DatabaseCreation.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.UserId);
-                    table.CheckConstraint("CK_Password", "LEN([Password]) > 15");
+                    table.CheckConstraint("CK_Password", "LEN([Password]) > 7");
                 });
 
             migrationBuilder.CreateTable(
@@ -87,7 +88,7 @@ namespace DatabaseCreation.Migrations
                     ShoppingListId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    Note = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Note = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
