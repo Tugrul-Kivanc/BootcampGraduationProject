@@ -1,0 +1,34 @@
+﻿@model ShoppingListModel.Models.ShoppingList
+
+@{
+    ViewData["Title"] = "CreateList";
+}
+
+<h1>CreateList</h1>
+
+<h4>ShoppingList</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateList">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ShoppingListName" class="control-label"></label>
+                <input asp-for="ShoppingListName" class="form-control" />
+                <span asp-validation-for="ShoppingListName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label"></label>
+                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
