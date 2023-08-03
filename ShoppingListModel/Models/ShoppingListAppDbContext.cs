@@ -79,9 +79,6 @@ public partial class ShoppingListAppDbContext : DbContext
         {
             entity.ToTable("User");
 
-            entity.Property(e => e.IsAdmin)
-                .IsRequired()
-                .HasDefaultValueSql("(CONVERT([bit],(0)))");
             entity.Property(e => e.Name).HasMaxLength(30);
             entity.Property(e => e.Password).HasMaxLength(128);
         });

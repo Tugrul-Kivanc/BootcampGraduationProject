@@ -9,6 +9,7 @@ public partial class Product
 
     public string Name { get; set; } = null!;
 
+    // https://imgur.com/a/NSPxANy
     public string Image { get; set; } = null!;
 
     public int CategoryId { get; set; }

@@ -1,0 +1,1 @@
+﻿Scaffold-DbContext "Server=.;Database=ShoppingListAppDb;Trusted_Connection=True;Encrypt=False" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
