@@ -10,7 +10,7 @@ namespace ShoppingListApp.Controllers
         public IActionResult List(int id) // Takes User Id
         {
             var shoppingLists = context.ShoppingLists.Where(a => a.UserId == id);
-            return View(shoppingLists);
+            return View(shoppingLists.ToList());
         }
 
         public IActionResult ListDetails(int id) // Takes Shopping List Id
@@ -23,6 +23,8 @@ namespace ShoppingListApp.Controllers
                         where ld.ShoppingListId == id
                         select new ShoppingListViewModel
                         {
+                            ShoppingListId = ld.ShoppingListId,
+                            Image = ld.Product.Image,
                             Name = ld.Product.Name,
                             Quantity = ld.Quantity,
                             Notes = ld.Note
