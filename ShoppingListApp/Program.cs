@@ -15,4 +15,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=ShoppingList}/{action=List}/{id?}");
 
+app.MapControllerRoute(
+    name: "adminPanel",
+    pattern: "{controller=Admin}/{action=Panel}");
+
 app.Run();
