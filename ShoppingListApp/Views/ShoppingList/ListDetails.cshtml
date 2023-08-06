@@ -2,6 +2,7 @@
 @model IEnumerable<ShoppingListViewModel>
 
 @{
+    // TODO Display the list Name
     ViewData["Title"] = "ListDetails";
 }
 
@@ -22,6 +23,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Notes)
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -39,7 +41,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Notes)
             </td>
+            <td>
+                <a asp-action="EditProduct" asp-route-id="@item.ProductId">Edit</a> |
+                <a asp-action="DeleteProduct" asp-route-id="@item.ProductId">Delete</a>
+            </td>
         </tr>
 }
     </tbody>
 </table>
+<p>
+    <a asp-action="AddProduct" asp-route-id="@ViewBag.ShoppingListId">Add a Product</a>
+</p>

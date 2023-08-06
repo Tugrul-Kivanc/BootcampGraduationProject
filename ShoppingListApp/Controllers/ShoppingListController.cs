@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
@@ -23,12 +24,14 @@ namespace ShoppingListApp.Controllers
                         where ld.ShoppingListId == id
                         select new ShoppingListViewModel
                         {
-                            ShoppingListId = ld.ShoppingListId,
+                            ProductId = ld.ProductId,
                             Image = ld.Product.Image,
                             Name = ld.Product.Name,
                             Quantity = ld.Quantity,
                             Notes = ld.Note
                         };
+
+            ViewBag.ShoppingListId = id;
 
             return View(query.ToList());
         }
@@ -40,7 +43,7 @@ namespace ShoppingListApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateList(ShoppingList list)
+        public IActionResult CreateList(ShoppingList listToCreate)
         {
 
             return View();
@@ -60,9 +63,71 @@ namespace ShoppingListApp.Controllers
             return View();
         }
 
+        public IActionResult AddProduct()
+        {
+            MakeProductSelectListViewBag();
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddProduct(ShoppingListDetail productToAdd)
+        {
+            try
+            {
+                ShoppingListDetail listDetail = new ShoppingListDetail();
+                listDetail.ProductId = productToAdd.ProductId;
+                listDetail.Product = context.Products.Where(a => a.ProductId == productToAdd.ProductId).SingleOrDefault();
+                listDetail.ShoppingListId = productToAdd.ShoppingListId;
+                listDetail.Note = productToAdd.Note;
+                listDetail.Quantity = productToAdd.Quantity;
+
+                context.ShoppingListDetails.Add(listDetail);
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
+
+                return RedirectToAction(nameof(ListDetails));
+            }
+            catch (Exception)
+            {
+                // TODO display error message or prevent input
+                return View();
+            }
+        }
+
+        public IActionResult EditProduct()
+        {
+            return View();
+        }
+
+        public IActionResult DeleteProduct()
+        {
+            return View();
+        }
+
         public IActionResult Shop()
         {
             return View();
+        }
+
+        private void MakeProductSelectListViewBag()
+        {
+            List<SelectListItem> selectList = new List<SelectListItem>();
+
+            var query = context.Products.Select(a => new
+            {
+                a.ProductId,
+                a.Name
+            }).ToList();
+
+            //foreach(var item in query)
+            //{
+            //    selectList.Add(new SelectListItem() { Text = item.Name, Value = item.CategoryId.ToString() });
+            //}
+
+            query.ForEach(a => selectList.Add(new SelectListItem() { Text = a.Name, Value = a.ProductId.ToString() }));
+
+            ViewBag.Products = selectList;
         }
     }
 }
