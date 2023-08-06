@@ -7,7 +7,7 @@
 <h1>Categories</h1>
 
 <p>
-    <a asp-action="AddCategory">Create New Category</a>
+    <a asp-action="CreateCategory">Create New Category</a>
 </p>
 <table class="table table-bordered">
     <thead>
@@ -31,9 +31,9 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                <a asp-action="EditCategory" asp-route-id="@item.CategoryId">Edit</a> |
+                <a asp-action="CategoryDetails" asp-route-id="@item.CategoryId">Details</a> |
+                <a asp-action="DeleteCategory" asp-route-id="@item.CategoryId">Delete</a>
             </td>
         </tr>
 }
