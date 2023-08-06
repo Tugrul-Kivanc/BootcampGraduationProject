@@ -98,9 +98,37 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult DeleteCategory()
+        public IActionResult DeleteCategory(int id)
         {
-            return View();
+            var category = context.Categories.Where(a => a.CategoryId == id);
+
+            if (category.Count() == 0)
+                throw new Exception("Category not Found");
+
+            return View(category.Single());
+        }
+
+        [HttpPost]
+        public IActionResult DeleteCategory(Category categoryToDelete)
+        {
+            try
+            {
+                var category = context.Categories.Where(a => a.CategoryId == categoryToDelete.CategoryId);
+
+                if (category.Count() == 0)
+                    throw new Exception("Category not Found");
+
+                context.Categories.Remove(category.Single());
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
+
+                return RedirectToAction(nameof(Categories));
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         public IActionResult CreateProduct()
@@ -179,9 +207,37 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult RemoveProduct()
+        public IActionResult DeleteProduct(int id)
         {
-            return View();
+            var product = context.Products.Include(a => a.Category).Where(b => b.ProductId == id);
+
+            if (product.Count() == 0)
+                throw new Exception("Product not Found");
+
+            return View(product.Single());
+        }
+
+        [HttpPost]
+        public IActionResult DeleteProduct(Product productToDelete)
+        {
+            try
+            {
+                var product = context.Products.Where(a => a.ProductId == productToDelete.ProductId);
+
+                if (product.Count() == 0)
+                    throw new Exception("Product not Found");
+
+                context.Products.Remove(product.Single());
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
+
+                return RedirectToAction(nameof(Products));
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         private void MakeCategorySelectListViewBag()
