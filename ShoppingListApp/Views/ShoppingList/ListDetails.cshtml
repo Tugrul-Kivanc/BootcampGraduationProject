@@ -42,7 +42,8 @@
                 @Html.DisplayFor(modelItem => item.Notes)
             </td>
             <td>
-                <a asp-action="EditProduct" asp-route-id="@item.ProductId">Edit</a> |
+                @*TODO fix route values*@
+                <a asp-action="EditProduct" asp-route-id="@item.ProductId" asp-route-listid="@Url.ActionContext.RouteData.Values["id"]">Edit</a> |
                 <a asp-action="DeleteProduct" asp-route-id="@item.ProductId">Delete</a>
             </td>
         </tr>

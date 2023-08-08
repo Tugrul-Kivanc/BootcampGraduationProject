@@ -58,14 +58,45 @@ namespace ShoppingListApp.Controllers
             return View(shoppingListDetails);
         }
 
-        public IActionResult DeleteList()
+        public IActionResult DeleteList(int? id)
         {
-            return View();
+            if (id == null || context.ShoppingLists == null)
+                return NotFound();
+
+            var shoppingListToDelete = context.ShoppingLists.Find(id);
+
+            if (shoppingListToDelete == null)
+                throw new Exception("Shopping List not Found");
+
+            return View(shoppingListToDelete);
+        }
+
+        [HttpPost, ActionName(nameof(DeleteList))]
+        public IActionResult DeleteListConfirm(int? id)
+        {
+            try
+            {
+                var shoppingListToDelete = context.ShoppingLists.Find(id);
+
+                if (shoppingListToDelete == null)
+                    throw new Exception("Shopping List Not Found");
+
+                context.ShoppingLists.Remove(shoppingListToDelete);
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
+
+                return RedirectToAction(nameof(DeleteList));
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         public IActionResult AddProduct()
         {
-            MakeProductSelectListViewBag();
+            GenerateProductSelectListViewBag();
             return View();
         }
 
@@ -95,9 +126,33 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult EditProduct()
+        public IActionResult EditProduct(int id, int listid)
         {
-            return View();
+            var product = context.Products.Find(id);
+
+            var model = new ShoppingListViewModel()
+            {
+                Image = product.Image,
+                Name = product.Name,
+                ProductId = product.ProductId,
+                Quantity = context.ShoppingListDetails.Where(a => a.ShoppingListId == listid && a.ProductId == id).Select(b => b.Quantity).Single(),
+                Notes = context.ShoppingListDetails.Where(a => a.ShoppingListId == listid && a.ProductId == id).Select(b => b.Note).Single()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditProduct(int id, int listid, ShoppingListViewModel model)
+        {
+            var listDetails = context.ShoppingListDetails.Where(a => a.ShoppingListId == listid && a.ProductId == id).Single();
+            listDetails.Quantity = model.Quantity;
+            listDetails.Note = model.Notes;
+
+            context.Update(listDetails);
+            context.SaveChanges();
+
+            return RedirectToAction(nameof(ListDetails),listid);
         }
 
         public IActionResult DeleteProduct()
@@ -110,7 +165,7 @@ namespace ShoppingListApp.Controllers
             return View();
         }
 
-        private void MakeProductSelectListViewBag()
+        private void GenerateProductSelectListViewBag()
         {
             List<SelectListItem> selectList = new List<SelectListItem>();
 
@@ -119,11 +174,6 @@ namespace ShoppingListApp.Controllers
                 a.ProductId,
                 a.Name
             }).ToList();
-
-            //foreach(var item in query)
-            //{
-            //    selectList.Add(new SelectListItem() { Text = item.Name, Value = item.CategoryId.ToString() });
-            //}
 
             query.ForEach(a => selectList.Add(new SelectListItem() { Text = a.Name, Value = a.ProductId.ToString() }));
 

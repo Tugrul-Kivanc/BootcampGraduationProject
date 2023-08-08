@@ -1,0 +1,34 @@
+﻿@model ShoppingListViewModel
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h1>Edit Product</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditProduct">
+            <input type="hidden" asp-for="ProductId" value="@Url.ActionContext.RouteData.Values["id"]" />
+            <div class="form-group">
+                <img src="@Model.Image" alt="@Model.Name" width="50" height="50">
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Categories">Back to Categories</a>
+</div>
+

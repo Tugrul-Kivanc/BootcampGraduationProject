@@ -66,9 +66,16 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult EditCategory()
+        public IActionResult EditCategory(int? id)
         {
-            return View();
+            if (id == null || context.Categories == null)
+                return NotFound();
+
+            var category = context.Categories.Find(id);
+            if (category == null)
+                return NotFound();
+
+            return View(category);
         }
 
         [HttpPost]
@@ -98,27 +105,30 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult DeleteCategory(int id)
+        public IActionResult DeleteCategory(int? id)
         {
-            var category = context.Categories.Where(a => a.CategoryId == id);
+            if(id == null || context.Categories == null)
+                return NotFound();
 
-            if (category.Count() == 0)
+            var categoryToDelete = context.Categories.Find(id);
+
+            if (categoryToDelete == null)
                 throw new Exception("Category not Found");
 
-            return View(category.Single());
+            return View(categoryToDelete);
         }
 
-        [HttpPost]
-        public IActionResult DeleteCategory(Category categoryToDelete)
+        [HttpPost, ActionName(nameof(DeleteCategory))]
+        public IActionResult DeleteCategoryConfirm(int? id)
         {
             try
             {
-                var category = context.Categories.Where(a => a.CategoryId == categoryToDelete.CategoryId);
+                var categoryToDelete = context.Categories.Find(id);
 
-                if (category.Count() == 0)
+                if (categoryToDelete == null)
                     throw new Exception("Category not Found");
 
-                context.Categories.Remove(category.Single());
+                context.Categories.Remove(categoryToDelete);
                 var result = context.SaveChanges();
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
@@ -133,7 +143,7 @@ namespace ShoppingListApp.Controllers
 
         public IActionResult CreateProduct()
         {
-            MakeCategorySelectListViewBag();
+            GenerateCategorySelectListViewBag();
 
             return View();
         }
@@ -165,15 +175,22 @@ namespace ShoppingListApp.Controllers
             catch (Exception)
             {
                 // TODO display error message or prevent input
-                MakeCategorySelectListViewBag();
+                GenerateCategorySelectListViewBag();
                 return View();
             }
         }
 
-        public IActionResult EditProduct()
+        public IActionResult EditProduct(int? id)
         {
-            MakeCategorySelectListViewBag();
-            return View();
+            if (id == null || context.Products == null)
+                return NotFound();
+
+            var product = context.Products.Find(id);
+            if (product == null)
+                return NotFound();
+
+            GenerateCategorySelectListViewBag();
+            return View(product);
         }
 
         [HttpPost]
@@ -202,32 +219,37 @@ namespace ShoppingListApp.Controllers
             catch (Exception)
             {
                 // TODO display error message or prevent input
-                MakeCategorySelectListViewBag();
+                GenerateCategorySelectListViewBag();
                 return View();
             }
         }
 
-        public IActionResult DeleteProduct(int id)
+        public IActionResult DeleteProduct(int? id)
         {
-            var product = context.Products.Include(a => a.Category).Where(b => b.ProductId == id);
+            if (id == null || context.Products == null)
+                return NotFound();
 
-            if (product.Count() == 0)
+            var productToDelete = context.Products.Find(id);
+
+            if (productToDelete == null)
                 throw new Exception("Product not Found");
 
-            return View(product.Single());
+            var query = context.Products.Where(b => b.ProductId == id).Include(b => b.Category).Single();
+
+            return View(query);
         }
 
-        [HttpPost]
-        public IActionResult DeleteProduct(Product productToDelete)
+        [HttpPost, ActionName(nameof(DeleteProduct))]
+        public IActionResult DeleteProductConfirm(int? id)
         {
             try
             {
-                var product = context.Products.Where(a => a.ProductId == productToDelete.ProductId);
+                var productToDelete = context.Products.Find(id);
 
-                if (product.Count() == 0)
+                if (productToDelete == null)
                     throw new Exception("Product not Found");
 
-                context.Products.Remove(product.Single());
+                context.Products.Remove(productToDelete);
                 var result = context.SaveChanges();
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
@@ -240,7 +262,7 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        private void MakeCategorySelectListViewBag()
+        private void GenerateCategorySelectListViewBag()
         {
             List<SelectListItem> selectList = new List<SelectListItem>();
 
@@ -249,11 +271,6 @@ namespace ShoppingListApp.Controllers
                 a.CategoryId,
                 a.Name
             }).ToList();
-
-            //foreach(var item in query)
-            //{
-            //    selectList.Add(new SelectListItem() { Text = item.Name, Value = item.CategoryId.ToString() });
-            //}
 
             query.ForEach(a => selectList.Add(new SelectListItem() { Text = a.Name, Value = a.CategoryId.ToString() }));
 
