@@ -5,14 +5,15 @@
 }
 
 <h1>Edit Product</h1>
+<h4>
+    <img src="@Model.Image" alt="@Model.Name" width="50" height="50"> @Html.DisplayFor(a => a.Name)
+</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="EditProduct">
-            <input type="hidden" asp-for="ProductId" value="@Url.ActionContext.RouteData.Values["id"]" />
-            <div class="form-group">
-                <img src="@Model.Image" alt="@Model.Name" width="50" height="50">
-            </div>
+            <input type="hidden" asp-for="ProductId" value="@ViewContext.RouteData.Values["productId"]" />
+            <input type="hidden" asp-for="ShoppingListId" value="@ViewContext.RouteData.Values["listId"]" />
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
                 <input asp-for="Quantity" class="form-control" />
@@ -29,6 +30,6 @@
 </div>
 
 <div>
-    <a asp-action="Categories">Back to Categories</a>
+    <a asp-action="ListDetails">Back to List</a>
 </div>
 

@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
+using System.Collections.Generic;
 
 namespace ShoppingListApp.Controllers
 {
+    [Route("[controller]/[action]")]
     public class ShoppingListController : ControllerBase
     {
+        [Route("{id:int}")]
         public IActionResult List(int id) // Takes User Id
         {
             var shoppingLists = context.ShoppingLists.Where(a => a.UserId == id);
             return View(shoppingLists.ToList());
         }
 
+        [Route("{id:int}")]
         public IActionResult ListDetails(int id) // Takes Shopping List Id
         {
             var query = from l in context.ShoppingLists
@@ -36,8 +40,8 @@ namespace ShoppingListApp.Controllers
             return View(query.ToList());
         }
 
-        [HttpGet]
-        public IActionResult CreateList()
+        [Route("{id:int}")]
+        public IActionResult CreateList(int id) //Takes user id
         {
             return View();
         }
@@ -49,6 +53,7 @@ namespace ShoppingListApp.Controllers
             return View();
         }
 
+        [Route("{id:int}")]
         public IActionResult EditList(int id) // Takes Shopping List Id
         {
             var shoppingListDetails = context.ShoppingListDetails.Include(a => a.Product)
@@ -58,9 +63,10 @@ namespace ShoppingListApp.Controllers
             return View(shoppingListDetails);
         }
 
-        public IActionResult DeleteList(int? id)
+        [Route("{id:int}")]
+        public IActionResult DeleteList(int id)
         {
-            if (id == null || context.ShoppingLists == null)
+            if (context.ShoppingLists == null)
                 return NotFound();
 
             var shoppingListToDelete = context.ShoppingLists.Find(id);
@@ -71,8 +77,9 @@ namespace ShoppingListApp.Controllers
             return View(shoppingListToDelete);
         }
 
+        [Route("{id:int}")]
         [HttpPost, ActionName(nameof(DeleteList))]
-        public IActionResult DeleteListConfirm(int? id)
+        public IActionResult DeleteListConfirm(int id)
         {
             try
             {
@@ -126,33 +133,39 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult EditProduct(int id, int listid)
+        [Route("{listId:int}/{productId:int}")]
+        public IActionResult EditProduct(int productId, int listId)
         {
-            var product = context.Products.Find(id);
+            var product = context.Products.Find(productId);
+            var productInList = context.ShoppingListDetails.Where(a => a.ShoppingListId == listId && a.ProductId == productId);
+
+            if (product == null || productInList.Count() == 0)
+                return RedirectToAction(nameof(ListDetails), new { id = listId });
 
             var model = new ShoppingListViewModel()
             {
                 Image = product.Image,
                 Name = product.Name,
                 ProductId = product.ProductId,
-                Quantity = context.ShoppingListDetails.Where(a => a.ShoppingListId == listid && a.ProductId == id).Select(b => b.Quantity).Single(),
-                Notes = context.ShoppingListDetails.Where(a => a.ShoppingListId == listid && a.ProductId == id).Select(b => b.Note).Single()
+                Quantity = productInList.Select(b => b.Quantity).Single(),
+                Notes = productInList.Select(b => b.Note).SingleOrDefault("")
             };
 
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult EditProduct(int id, int listid, ShoppingListViewModel model)
+        [Route("{listId:int}/{productId:int}")]
+        public IActionResult EditProduct(ShoppingListViewModel model)
         {
-            var listDetails = context.ShoppingListDetails.Where(a => a.ShoppingListId == listid && a.ProductId == id).Single();
+            var listDetails = context.ShoppingListDetails.Where(a => a.ShoppingListId == model.ShoppingListId && a.ProductId == model.ProductId).Single();
             listDetails.Quantity = model.Quantity;
             listDetails.Note = model.Notes;
 
             context.Update(listDetails);
             context.SaveChanges();
 
-            return RedirectToAction(nameof(ListDetails),listid);
+            return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
         }
 
         public IActionResult DeleteProduct()
