@@ -6,6 +6,7 @@ using ShoppingListModel.Models;
 
 namespace ShoppingListApp.Controllers
 {
+    [Route("[controller]/[action]")]
     public class AdminController : ControllerBase
     {
         public IActionResult Panel()
@@ -66,7 +67,8 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult EditCategory(int? id)
+        [Route("{id:int}")]
+        public IActionResult EditCategory(int id)
         {
             if (id == null || context.Categories == null)
                 return NotFound();
@@ -105,21 +107,23 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult DeleteCategory(int? id)
+        [Route("{id:int}")]
+        public IActionResult DeleteCategory(int id)
         {
-            if(id == null || context.Categories == null)
+            if(context.Categories == null)
                 return NotFound();
 
             var categoryToDelete = context.Categories.Find(id);
 
             if (categoryToDelete == null)
-                throw new Exception("Category not Found");
+                return RedirectToAction(nameof(Categories));
 
             return View(categoryToDelete);
         }
 
+        [Route("{id:int}")]
         [HttpPost, ActionName(nameof(DeleteCategory))]
-        public IActionResult DeleteCategoryConfirm(int? id)
+        public IActionResult DeleteCategoryConfirm(int id)
         {
             try
             {
@@ -180,9 +184,10 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult EditProduct(int? id)
+        [Route("{id:int}")]
+        public IActionResult EditProduct(int id)
         {
-            if (id == null || context.Products == null)
+            if (context.Products == null)
                 return NotFound();
 
             var product = context.Products.Find(id);
@@ -224,23 +229,25 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult DeleteProduct(int? id)
+        [Route("{id:int}")]
+        public IActionResult DeleteProduct(int id)
         {
-            if (id == null || context.Products == null)
+            if (context.Products == null)
                 return NotFound();
 
             var productToDelete = context.Products.Find(id);
 
             if (productToDelete == null)
-                throw new Exception("Product not Found");
+                return RedirectToAction(nameof(Products));
 
             var query = context.Products.Where(b => b.ProductId == id).Include(b => b.Category).Single();
 
             return View(query);
         }
 
+        [Route("{id:int}")]
         [HttpPost, ActionName(nameof(DeleteProduct))]
-        public IActionResult DeleteProductConfirm(int? id)
+        public IActionResult DeleteProductConfirm(int id)
         {
             try
             {
