@@ -12,7 +12,11 @@ namespace ShoppingListApp.Validators
                 .Length(2, 30).WithMessage("Name length should be between {0} and {1}.");
 
             RuleFor(a => a.Image)
-                .NotNull().WithMessage("Image Url is required");
+                .NotNull().WithMessage("Image Url is required.");
+
+            RuleFor(a => a.CategoryId)
+                .NotNull().WithMessage("Select a Category.")
+                .NotEqual(0).WithMessage("Select a Category.");
         }
     }
 }
