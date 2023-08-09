@@ -2,9 +2,11 @@
 
 namespace ShoppingListApp.Controllers
 {
+    [Route("[controller]/[action]")]
     public class LoginController : ControllerBase
     {
-        public IActionResult Login()
+        [Route("")]
+        public IActionResult Index()
         {
             return View();
         }
