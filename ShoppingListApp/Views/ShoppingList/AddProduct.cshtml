@@ -11,7 +11,7 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="AddProduct">
-            <input type="hidden" asp-for="ShoppingListId" value="@Url.ActionContext.RouteData.Values["id"]" />
+            <input type="hidden" asp-for="ShoppingListId" value="@Url.ActionContext.RouteData.Values["listId"]" />
             <div class="form-group">
                 <label asp-for="ProductId" class="control-label"></label>
                 <select asp-for="ProductId" asp-items="ViewBag.Products" class="form-control">

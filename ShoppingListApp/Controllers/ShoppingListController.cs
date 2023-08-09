@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
 using System.Collections.Generic;
+using static Azure.Core.HttpHeader;
 
 namespace ShoppingListApp.Controllers
 {
@@ -47,20 +49,70 @@ namespace ShoppingListApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateList(ShoppingList listToCreate)
+        [Route("{id:int}")]
+        public IActionResult CreateList(int id, ShoppingList listToCreate)
         {
 
-            return View();
+            try
+            {
+                var isDuplicateName = context.ShoppingLists.Where(a => a.ShoppingListName == listToCreate.ShoppingListName).Count() > 0;
+
+                if (isDuplicateName)
+                    throw new Exception("Shopping List Already Exists");
+
+                ShoppingList shoppingList = new ShoppingList();
+                shoppingList.ShoppingListName = listToCreate.ShoppingListName;
+                shoppingList.UserId = id;
+
+                context.ShoppingLists.Add(shoppingList);
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
+
+                return RedirectToAction(nameof(List), new { id = id });
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         [Route("{id:int}")]
         public IActionResult EditList(int id) // Takes Shopping List Id
         {
-            var shoppingListDetails = context.ShoppingListDetails.Include(a => a.Product)
-                .Where(b => b.ShoppingListId == id)
-                .ToList();
+            var shoppingList = context.ShoppingLists.Find(id);
 
-            return View(shoppingListDetails);
+            if (shoppingList == null)
+                return NotFound();
+
+            return View(shoppingList);
+        }
+
+        [HttpPost]
+        [Route("{id:int}")]
+        public IActionResult EditList(ShoppingList shoppingListToEdit)
+        {
+            try
+            {
+                var isDuplicateName = context.ShoppingLists.Where(a => a.ShoppingListName == shoppingListToEdit.ShoppingListName).Count() > 0;
+
+                if (isDuplicateName)
+                    throw new Exception("Shopping List already exists");
+
+                var shoppingList = context.ShoppingLists.Find(shoppingListToEdit.ShoppingListId);
+                shoppingList.ShoppingListName = shoppingListToEdit.ShoppingListName;
+
+                var result = context.SaveChanges();
+
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
+
+                return RedirectToAction(nameof(List), new { id = 1 });
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         [Route("{id:int}")]
@@ -72,7 +124,7 @@ namespace ShoppingListApp.Controllers
             var shoppingListToDelete = context.ShoppingLists.Find(id);
 
             if (shoppingListToDelete == null)
-                throw new Exception("Shopping List not Found");
+                return RedirectToAction(nameof(List), new { id = 1 }); //TODO change id to take userid. Probably use session
 
             return View(shoppingListToDelete);
         }
@@ -101,13 +153,15 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult AddProduct()
+        [Route("{listId:int}")]
+        public IActionResult AddProduct(int listId)
         {
             GenerateProductSelectListViewBag();
             return View();
         }
 
         [HttpPost]
+        [Route("{listId:int}")]
         public IActionResult AddProduct(ShoppingListDetail productToAdd)
         {
             try
@@ -124,7 +178,7 @@ namespace ShoppingListApp.Controllers
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
-                return RedirectToAction(nameof(ListDetails));
+                return RedirectToAction(nameof(ListDetails), new {id = productToAdd.ShoppingListId});
             }
             catch (Exception)
             {
@@ -134,7 +188,7 @@ namespace ShoppingListApp.Controllers
         }
 
         [Route("{listId:int}/{productId:int}")]
-        public IActionResult EditProduct(int productId, int listId)
+        public IActionResult EditProduct(int listId, int productId)
         {
             var product = context.Products.Find(productId);
             var productInList = context.ShoppingListDetails.Where(a => a.ShoppingListId == listId && a.ProductId == productId);
@@ -142,14 +196,12 @@ namespace ShoppingListApp.Controllers
             if (product == null || productInList.Count() == 0)
                 return RedirectToAction(nameof(ListDetails), new { id = listId });
 
-            var model = new ShoppingListViewModel()
-            {
-                Image = product.Image,
-                Name = product.Name,
-                ProductId = product.ProductId,
-                Quantity = productInList.Select(b => b.Quantity).Single(),
-                Notes = productInList.Select(b => b.Note).SingleOrDefault("")
-            };
+            var model = new ShoppingListViewModel();
+            model.Image = product.Image;
+            model.Name = product.Name;
+            model.ProductId = product.ProductId;
+            model.Quantity = productInList.Select(b => b.Quantity).Single();
+            model.Notes = productInList.Select(b => b.Note).Single();
 
             return View(model);
         }
@@ -168,9 +220,35 @@ namespace ShoppingListApp.Controllers
             return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
         }
 
-        public IActionResult DeleteProduct()
+        [Route("{listId:int}/{productId:int}")]
+        public IActionResult RemoveProduct(int listId, int productId)
         {
-            return View();
+            var productToRemove = context.Products.Find(productId);
+            var productInList = context.ShoppingListDetails.Where(a => a.ShoppingListId == listId && a.ProductId == productId);
+
+            if (productToRemove == null || productInList.Count() == 0)
+                return RedirectToAction(nameof(ListDetails), new { id = listId });
+
+            var model = new ShoppingListViewModel();
+            model.Image = productToRemove.Image;
+            model.Name = productToRemove.Name;
+            model.ProductId = productToRemove.ProductId;
+            model.Quantity = productInList.Select(b => b.Quantity).Single();
+            model.Notes = productInList.Select(b => b.Note).Single();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Route("{listId:int}/{productId:int}")]
+        public IActionResult RemoveProduct(ShoppingListViewModel model)
+        {
+            var productToRemove = context.ShoppingListDetails.Where(a => a.ShoppingListId == model.ShoppingListId && a.ProductId == model.ProductId).Single();
+
+            context.ShoppingListDetails.Remove(productToRemove);
+            context.SaveChanges();
+
+            return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
         }
 
         public IActionResult Shop()

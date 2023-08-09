@@ -7,7 +7,7 @@
 <h1>Shopping Lists</h1>
 
 <p>
-    <a asp-action="CreateList">Create New Shopping List</a>
+    <a asp-action="CreateList" asp-route-id="@ViewContext.RouteData.Values["id"]">Create New Shopping List</a>
 </p>
 <table class="table table-bordered">
     <tbody>
@@ -19,6 +19,7 @@
                 </td>
                 <td>
                     <a asp-action="ListDetails" asp-route-id="@item.ShoppingListId">Details</a> |
+                    <a asp-action="EditList" asp-route-id="@item.ShoppingListId">Rename</a> |
                     <a asp-action="DeleteList" asp-route-id="@item.ShoppingListId">Delete</a> |
                     <a asp-action="Shop" asp-route-id="@item.ShoppingListId">Start Shopping</a>
                 </td>

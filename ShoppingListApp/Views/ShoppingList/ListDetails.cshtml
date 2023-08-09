@@ -7,15 +7,15 @@
 }
 
 <h1>ListDetails</h1>
-
+<p>
+    <a asp-action="AddProduct" asp-route-listId="@ViewBag.ShoppingListId">Add a Product</a>
+</p>
+<hr />
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayName("Product")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
@@ -31,8 +31,6 @@
         <tr>
             <td>
                 <img src="@item.Image" alt="@item.Name" width="50" height="50">
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
@@ -42,13 +40,11 @@
                 @Html.DisplayFor(modelItem => item.Notes)
             </td>
             <td>
-                <a asp-action="EditProduct" asp-route-listId="@Url.ActionContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId">Edit</a> |
-                <a asp-action="DeleteProduct" asp-route-id="@item.ProductId">Delete</a>
+                <a asp-action="EditProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId">Edit</a> |
+                    <a asp-action="RemoveProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
-<p>
-    <a asp-action="AddProduct" asp-route-id="@ViewBag.ShoppingListId">Add a Product</a>
-</p>
+
