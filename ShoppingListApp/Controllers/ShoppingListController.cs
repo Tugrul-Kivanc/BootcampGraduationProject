@@ -50,19 +50,15 @@ namespace ShoppingListApp.Controllers
 
         [HttpPost]
         [Route("{id:int}")]
-        public IActionResult CreateList(int id, ShoppingList listToCreate)
+        public IActionResult CreateList(int id, ShoppingList listToCreate) //Takes user id
         {
-
             try
             {
-                var isDuplicateName = context.ShoppingLists.Where(a => a.ShoppingListName == listToCreate.ShoppingListName).Count() > 0;
-
-                if (isDuplicateName)
-                    throw new Exception("Shopping List Already Exists");
-
-                ShoppingList shoppingList = new ShoppingList();
-                shoppingList.ShoppingListName = listToCreate.ShoppingListName;
-                shoppingList.UserId = id;
+                ShoppingList shoppingList = new ShoppingList()
+                {
+                    ShoppingListName = listToCreate.ShoppingListName,
+                    UserId = id
+                };
 
                 context.ShoppingLists.Add(shoppingList);
                 var result = context.SaveChanges();
@@ -83,7 +79,7 @@ namespace ShoppingListApp.Controllers
             var shoppingList = context.ShoppingLists.Find(id);
 
             if (shoppingList == null)
-                return NotFound();
+                return RedirectToAction(nameof(List), new { id = 1 }); // TODO redirect with user session
 
             return View(shoppingList);
         }
@@ -94,20 +90,14 @@ namespace ShoppingListApp.Controllers
         {
             try
             {
-                var isDuplicateName = context.ShoppingLists.Where(a => a.ShoppingListName == shoppingListToEdit.ShoppingListName).Count() > 0;
-
-                if (isDuplicateName)
-                    throw new Exception("Shopping List already exists");
-
                 var shoppingList = context.ShoppingLists.Find(shoppingListToEdit.ShoppingListId);
                 shoppingList.ShoppingListName = shoppingListToEdit.ShoppingListName;
 
                 var result = context.SaveChanges();
-
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
-                return RedirectToAction(nameof(List), new { id = 1 });
+                return RedirectToAction(nameof(List), new { id = 1 }); //TODO redirect with user session
             }
             catch (Exception)
             {
@@ -118,9 +108,6 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult DeleteList(int id)
         {
-            if (context.ShoppingLists == null)
-                return NotFound();
-
             var shoppingListToDelete = context.ShoppingLists.Find(id);
 
             if (shoppingListToDelete == null)
@@ -138,7 +125,7 @@ namespace ShoppingListApp.Controllers
                 var shoppingListToDelete = context.ShoppingLists.Find(id);
 
                 if (shoppingListToDelete == null)
-                    throw new Exception("Shopping List Not Found");
+                    return RedirectToAction(nameof(List), new { id = 1 }); //TODO change id to take userid. Probably use session
 
                 context.ShoppingLists.Remove(shoppingListToDelete);
                 var result = context.SaveChanges();
@@ -164,14 +151,17 @@ namespace ShoppingListApp.Controllers
         [Route("{listId:int}")]
         public IActionResult AddProduct(ShoppingListDetail productToAdd)
         {
+            GenerateProductSelectListViewBag();
             try
             {
-                ShoppingListDetail listDetail = new ShoppingListDetail();
-                listDetail.ProductId = productToAdd.ProductId;
-                listDetail.Product = context.Products.Where(a => a.ProductId == productToAdd.ProductId).SingleOrDefault();
-                listDetail.ShoppingListId = productToAdd.ShoppingListId;
-                listDetail.Note = productToAdd.Note;
-                listDetail.Quantity = productToAdd.Quantity;
+                ShoppingListDetail listDetail = new ShoppingListDetail()
+                {
+                    ProductId = productToAdd.ProductId,
+                    Product = context.Products.Where(a => a.ProductId == productToAdd.ProductId).SingleOrDefault(),
+                    ShoppingListId = productToAdd.ShoppingListId,
+                    Note = productToAdd.Note,
+                    Quantity = productToAdd.Quantity
+                };
 
                 context.ShoppingListDetails.Add(listDetail);
                 var result = context.SaveChanges();
@@ -182,7 +172,6 @@ namespace ShoppingListApp.Controllers
             }
             catch (Exception)
             {
-                // TODO display error message or prevent input
                 return View();
             }
         }
@@ -190,18 +179,10 @@ namespace ShoppingListApp.Controllers
         [Route("{listId:int}/{productId:int}")]
         public IActionResult EditProduct(int listId, int productId)
         {
-            var product = context.Products.Find(productId);
-            var productInList = context.ShoppingListDetails.Where(a => a.ShoppingListId == listId && a.ProductId == productId);
+            var model = GetShoppingListViewModel(listId, productId);
 
-            if (product == null || productInList.Count() == 0)
+            if(model == null)
                 return RedirectToAction(nameof(ListDetails), new { id = listId });
-
-            var model = new ShoppingListViewModel();
-            model.Image = product.Image;
-            model.Name = product.Name;
-            model.ProductId = product.ProductId;
-            model.Quantity = productInList.Select(b => b.Quantity).Single();
-            model.Notes = productInList.Select(b => b.Note).Single();
 
             return View(model);
         }
@@ -210,31 +191,32 @@ namespace ShoppingListApp.Controllers
         [Route("{listId:int}/{productId:int}")]
         public IActionResult EditProduct(ShoppingListViewModel model)
         {
-            var listDetails = context.ShoppingListDetails.Where(a => a.ShoppingListId == model.ShoppingListId && a.ProductId == model.ProductId).Single();
-            listDetails.Quantity = model.Quantity;
-            listDetails.Note = model.Notes;
+            try
+            {
+                var listDetails = context.ShoppingListDetails.Where(a => a.ShoppingListId == model.ShoppingListId && a.ProductId == model.ProductId).Single();
+                listDetails.Quantity = model.Quantity <= 0 ? 1 : model.Quantity;
+                listDetails.Note = model.Notes;
 
-            context.Update(listDetails);
-            context.SaveChanges();
+                context.Update(listDetails);
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
 
-            return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
+                return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         [Route("{listId:int}/{productId:int}")]
         public IActionResult RemoveProduct(int listId, int productId)
         {
-            var productToRemove = context.Products.Find(productId);
-            var productInList = context.ShoppingListDetails.Where(a => a.ShoppingListId == listId && a.ProductId == productId);
+            var model = GetShoppingListViewModel(listId, productId);
 
-            if (productToRemove == null || productInList.Count() == 0)
+            if (model == null)
                 return RedirectToAction(nameof(ListDetails), new { id = listId });
-
-            var model = new ShoppingListViewModel();
-            model.Image = productToRemove.Image;
-            model.Name = productToRemove.Name;
-            model.ProductId = productToRemove.ProductId;
-            model.Quantity = productInList.Select(b => b.Quantity).Single();
-            model.Notes = productInList.Select(b => b.Note).Single();
 
             return View(model);
         }
@@ -243,16 +225,26 @@ namespace ShoppingListApp.Controllers
         [Route("{listId:int}/{productId:int}")]
         public IActionResult RemoveProduct(ShoppingListViewModel model)
         {
-            var productToRemove = context.ShoppingListDetails.Where(a => a.ShoppingListId == model.ShoppingListId && a.ProductId == model.ProductId).Single();
+            try
+            {
+                var productToRemove = context.ShoppingListDetails.Where(a => a.ShoppingListId == model.ShoppingListId && a.ProductId == model.ProductId).Single();
 
-            context.ShoppingListDetails.Remove(productToRemove);
-            context.SaveChanges();
+                context.ShoppingListDetails.Remove(productToRemove);
+                var result = context.SaveChanges();
+                if (result == 0)
+                    throw new Exception("No changes were made to the database");
 
-            return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
+                return RedirectToAction(nameof(ListDetails), new { id = model.ShoppingListId });
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         public IActionResult Shop()
         {
+            //TODO Shop
             return View();
         }
 
@@ -269,6 +261,26 @@ namespace ShoppingListApp.Controllers
             query.ForEach(a => selectList.Add(new SelectListItem() { Text = a.Name, Value = a.ProductId.ToString() }));
 
             ViewBag.Products = selectList;
+        }
+
+        private ShoppingListViewModel GetShoppingListViewModel(int listId, int productId)
+        {
+            var productToEdit = context.Products.Find(productId);
+            var productInList = context.ShoppingListDetails.Where(a => a.ShoppingListId == listId && a.ProductId == productId);
+
+            if (productToEdit == null || productInList.Count() == 0)
+                return null;
+
+            var model = new ShoppingListViewModel()
+            {
+                Image = productToEdit.Image,
+                Name = productToEdit.Name,
+                ProductId = productId,
+                Quantity = productInList.Select(b => b.Quantity).Single(),
+                Notes = productInList.Select(b => b.Note).Single()
+            };
+
+            return model;
         }
     }
 }

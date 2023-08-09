@@ -50,12 +50,13 @@ namespace ShoppingListApp.Controllers
             try
             {
                 var isDuplicateName = context.Categories.Where(a => a.Name == categoryToAdd.Name).Count() > 0;
-
                 if (isDuplicateName)
                     throw new Exception("Category already exists");
 
-                Category category = new Category();
-                category.Name = categoryToAdd.Name; 
+                Category category = new Category()
+                {
+                    Name = categoryToAdd.Name
+                };
 
                 context.Categories.Add(category);
                 var result = context.SaveChanges();
@@ -74,12 +75,9 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult EditCategory(int id)
         {
-            if (context.Categories == null)
-                return NotFound();
-
             var category = context.Categories.Find(id);
             if (category == null)
-                return NotFound();
+                return RedirectToAction(nameof(Categories));
 
             return View(category);
         }
@@ -91,7 +89,6 @@ namespace ShoppingListApp.Controllers
             try
             {
                 var isDuplicateName = context.Categories.Where(a => a.Name == categoryToEdit.Name).Count() > 0;
-
                 if (isDuplicateName)
                     throw new Exception("Category already exists");
 
@@ -99,7 +96,6 @@ namespace ShoppingListApp.Controllers
                 category.Name = categoryToEdit.Name;
                 
                 var result = context.SaveChanges();
-
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
@@ -115,11 +111,7 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult DeleteCategory(int id)
         {
-            if(context.Categories == null)
-                return NotFound();
-
             var categoryToDelete = context.Categories.Find(id);
-
             if (categoryToDelete == null)
                 return RedirectToAction(nameof(Categories));
 
@@ -133,9 +125,8 @@ namespace ShoppingListApp.Controllers
             try
             {
                 var categoryToDelete = context.Categories.Find(id);
-
                 if (categoryToDelete == null)
-                    throw new Exception("Category not Found");
+                    return RedirectToAction(nameof(Categories));
 
                 context.Categories.Remove(categoryToDelete);
                 var result = context.SaveChanges();
@@ -160,22 +151,24 @@ namespace ShoppingListApp.Controllers
         [HttpPost]
         public IActionResult CreateProduct(ProductCreateViewModel productToAdd)
         {
+            GenerateCategorySelectListViewBag();
             try
             {
                 var isDuplicateName = context.Products.Where(a => a.Name == productToAdd.Name).Count() > 0;
                 var isSameCategory = context.Products.Where(a => a.CategoryId == productToAdd.CategoryId).Count() > 0;
 
                 if (isDuplicateName && isSameCategory)
-                    throw new Exception("Product already exists in category");
+                    return RedirectToAction(nameof(Products));
 
-                Product product = new Product();
-                product.CategoryId = productToAdd.CategoryId;
-                product.Name = productToAdd.Name;
-                product.Image = productToAdd.Image;
+                Product product = new Product()
+                {
+                    CategoryId = productToAdd.CategoryId,
+                    Name = productToAdd.Name,
+                    Image = productToAdd.Image
+                };
 
                 context.Products.Add(product);
                 var result = context.SaveChanges();
-
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
@@ -183,8 +176,6 @@ namespace ShoppingListApp.Controllers
             }
             catch (Exception)
             {
-                // TODO display error message or prevent input
-                GenerateCategorySelectListViewBag();
                 return View();
             }
         }
@@ -192,12 +183,9 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult EditProduct(int id)
         {
-            if (context.Products == null)
-                return NotFound();
-
             var product = context.Products.Find(id);
             if (product == null)
-                return NotFound();
+                return RedirectToAction(nameof(Products));
 
             GenerateCategorySelectListViewBag();
             return View(product);
@@ -207,13 +195,14 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult EditProduct(int id, Product productToEdit) // TODO Show current values
         {
+            GenerateCategorySelectListViewBag();
             try
             {
                 var isDuplicateName = context.Products.Where(a => a.Name == productToEdit.Name).Count() > 0;
                 var isSameCategory = context.Products.Where(a => a.CategoryId == productToEdit.CategoryId).Count() > 0;
 
                 if (isDuplicateName && isSameCategory)
-                    throw new Exception("Product already exists");
+                    return RedirectToAction(nameof(Products));
 
                 var product = context.Products.Where(a => a.ProductId == id).SingleOrDefault();
                 product.CategoryId = productToEdit.CategoryId;
@@ -221,7 +210,6 @@ namespace ShoppingListApp.Controllers
                 product.Image = productToEdit.Image;
 
                 var result = context.SaveChanges();
-
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
@@ -230,7 +218,6 @@ namespace ShoppingListApp.Controllers
             catch (Exception)
             {
                 // TODO display error message or prevent input
-                GenerateCategorySelectListViewBag();
                 return View();
             }
         }
@@ -238,11 +225,7 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult DeleteProduct(int id)
         {
-            if (context.Products == null)
-                return NotFound();
-
             var productToDelete = context.Products.Find(id);
-
             if (productToDelete == null)
                 return RedirectToAction(nameof(Products));
 
@@ -258,9 +241,8 @@ namespace ShoppingListApp.Controllers
             try
             {
                 var productToDelete = context.Products.Find(id);
-
                 if (productToDelete == null)
-                    throw new Exception("Product not Found");
+                    return RedirectToAction(nameof(Products));
 
                 context.Products.Remove(productToDelete);
                 var result = context.SaveChanges();
