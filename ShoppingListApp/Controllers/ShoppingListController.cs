@@ -22,24 +22,24 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult ListDetails(int id) // Takes Shopping List Id
         {
-            var query = from l in context.ShoppingLists
-                        join d in context.ShoppingListDetails
-                        on l.ShoppingListId equals d.ShoppingListId
-                        into listDetails
-                        from ld in listDetails.DefaultIfEmpty()
-                        where ld.ShoppingListId == id
-                        select new ShoppingListViewModel
-                        {
-                            ProductId = ld.ProductId,
-                            Image = ld.Product.Image,
-                            Name = ld.Product.Name,
-                            Quantity = ld.Quantity,
-                            Notes = ld.Note
-                        };
+            var productList = from d in context.ShoppingListDetails
+                         join p in context.Products
+                         on d.ProductId equals p.ProductId
+                         into listDetails
+                         from ld in listDetails.DefaultIfEmpty()
+                         where d.ShoppingListId == id
+                         select new ShoppingListViewModel
+                         {
+                             ProductId = ld.ProductId,
+                             Image = ld.Image,
+                             Name = ld.Name,
+                             Quantity = d.Quantity,
+                             Notes = d.Note
+                         };
 
             ViewBag.ShoppingListId = id;
 
-            return View(query.ToList());
+            return View(productList.ToList());
         }
 
         [Route("{id:int}")]

@@ -22,17 +22,21 @@ namespace ShoppingListApp.Controllers
 
         public IActionResult Products()
         {
-            var products = context.Products.Include(a => a.Category)
-                            .Select(b => new ProductViewModel
-                            {
-                                ProductId = b.ProductId,
-                                CategoryId = b.CategoryId,
-                                CategoryName = b.Category.Name,
-                                Name = b.Name,
-                                Image = b.Image,
-                            }).ToList();
+            var products = from p in context.Products
+                        join c in context.Categories
+                        on p.CategoryId equals c.CategoryId
+                        into productCategory
+                        from pc in productCategory
+                        select new ProductViewModel
+                        {
+                            ProductId = p.ProductId,
+                            CategoryId = pc.CategoryId,
+                            CategoryName = pc.Name,
+                            Name = p.Name,
+                            Image = p.Image
+                        };
 
-            return View(products);
+            return View(products.ToList());
         }
 
         public IActionResult CreateCategory()
