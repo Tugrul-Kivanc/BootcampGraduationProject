@@ -70,7 +70,7 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult EditCategory(int id)
         {
-            if (id == null || context.Categories == null)
+            if (context.Categories == null)
                 return NotFound();
 
             var category = context.Categories.Find(id);
@@ -81,7 +81,8 @@ namespace ShoppingListApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditCategory(Category categoryToEdit) // TODO Show current values
+        [Route("{id:int}")]
+        public IActionResult EditCategory(int id, Category categoryToEdit) // TODO Show current values
         {
             try
             {
@@ -90,7 +91,7 @@ namespace ShoppingListApp.Controllers
                 if (isDuplicateName)
                     throw new Exception("Category already exists");
 
-                var category = context.Categories.Where(a => a.CategoryId == categoryToEdit.CategoryId).SingleOrDefault();
+                var category = context.Categories.Where(a => a.CategoryId == id).SingleOrDefault();
                 category.Name = categoryToEdit.Name;
                 
                 var result = context.SaveChanges();
@@ -199,7 +200,8 @@ namespace ShoppingListApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditProduct(Product productToEdit) // TODO Show current values
+        [Route("{id:int}")]
+        public IActionResult EditProduct(int id, Product productToEdit) // TODO Show current values
         {
             try
             {
@@ -209,7 +211,7 @@ namespace ShoppingListApp.Controllers
                 if (isDuplicateName && isSameCategory)
                     throw new Exception("Product already exists");
 
-                var product = context.Products.Where(a => a.ProductId == productToEdit.ProductId).SingleOrDefault();
+                var product = context.Products.Where(a => a.ProductId == id).SingleOrDefault();
                 product.CategoryId = productToEdit.CategoryId;
                 product.Name = productToEdit.Name;
                 product.Image = productToEdit.Image;
