@@ -8,11 +8,11 @@ namespace ShoppingListApp.Validators
         public ShoppingListDetailValidator()
         {
             RuleFor(a => a.Quantity)
-                .NotNull().WithMessage("{0} is required")
-                .GreaterThan(0).WithMessage("{0} should be bigger than {1}");
+                .NotNull().WithMessage("Quantity is required")
+                .GreaterThan(0).WithMessage("Quantity should be bigger than {0}");
 
             RuleFor(a => a.Note)
-                .MaximumLength(100).WithMessage("{0} length should not exceed {1}.");
+                .MaximumLength(100).WithMessage("Note length should not exceed {0}.");
         }
     }
 }
