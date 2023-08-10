@@ -1,11 +1,10 @@
 ﻿@model IEnumerable<ShoppingListViewModel>
 
 @{
-    // TODO Display the list Name
-    ViewData["Title"] = "ListDetails";
+    ViewData["Title"] = @ViewBag.ListName;
 }
 
-<h1>ListDetails</h1>
+<h1>@ViewBag.ListName</h1>
 <p>
     <a asp-action="AddProduct" asp-route-listId="@ViewBag.ShoppingListId">Add a Product</a>
 </p>

@@ -69,7 +69,6 @@ namespace ShoppingListApp.Controllers
             }
             catch (Exception)
             {
-                // TODO display error message or prevent input
                 return View();
             }
         }
@@ -86,7 +85,7 @@ namespace ShoppingListApp.Controllers
 
         [HttpPost]
         [Route("{id:int}")]
-        public IActionResult EditCategory(int id, Category categoryToEdit) // TODO Show current values
+        public IActionResult EditCategory(int id, Category categoryToEdit)
         {
             try
             {
@@ -105,7 +104,6 @@ namespace ShoppingListApp.Controllers
             }
             catch (Exception)
             {
-                // TODO display error message or prevent input
                 return View();
             }
         }
@@ -190,7 +188,7 @@ namespace ShoppingListApp.Controllers
 
         [HttpPost]
         [Route("{id:int}")]
-        public IActionResult EditProduct(int id, ProductViewModel productToEdit) // TODO Show current values
+        public IActionResult EditProduct(int id, ProductViewModel productToEdit)
         {
             GenerateCategorySelectListViewBag();
             try
