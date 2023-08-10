@@ -37,9 +37,8 @@
                     @Html.DisplayFor(modelItem => item.Notes)
                 </td>
                 <td>
-                    <form asp-action="ShopUpdate">
-                        <input type="submit" value="Bought" class="btn btn-primary" asp-route-listId="@item.ShoppingListId" asp-route-productId="@item.ProductId" />
-                    </form>
+                    @*TODO hide product with button press*@
+                    <button type="submit" class="btn btn-primary">Bought</button>
                 </td>
             </tr>
         }

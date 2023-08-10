@@ -247,19 +247,7 @@ namespace ShoppingListApp.Controllers
             ViewBag.ListName = context.ShoppingLists.Find(listId).ShoppingListName;
 
             var shoppingList = GetListDetails(listId);
-            HttpContext.Session.SetObject("ShoppingList", shoppingList);
 
-            return View(shoppingList);
-        }
-
-        [HttpPost]
-        [Route("{listId:int}/{productId:int}")]
-        [ActionName(nameof(Shop))]
-        public IActionResult ShopUpdate(int listId, int productId)
-        {
-            var shoppingList = HttpContext.Session.GetObject<List<ShoppingListViewModel>>("ShoppingList");
-            var productToRemove = shoppingList.Where(a => a.ShoppingListId == listId && a.ProductId == productId).Single();
-            shoppingList.Remove(productToRemove);
             return View(shoppingList);
         }
 
