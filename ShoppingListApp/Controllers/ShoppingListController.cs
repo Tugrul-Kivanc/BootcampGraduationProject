@@ -30,22 +30,8 @@ namespace ShoppingListApp.Controllers
         public IActionResult ListDetails(int id) // Takes Shopping List Id
         {
             ViewBag.ListName = context.ShoppingLists.Find(id).ShoppingListName;
-            var productList = from d in context.ShoppingListDetails
-                         join p in context.Products
-                         on d.ProductId equals p.ProductId
-                         into listDetails
-                         from ld in listDetails.DefaultIfEmpty()
-                         where d.ShoppingListId == id
-                         select new ShoppingListViewModel
-                         {
-                             ProductId = ld.ProductId,
-                             Image = ld.Image,
-                             Name = ld.Name,
-                             Quantity = d.Quantity,
-                             Notes = d.Note
-                         };
 
-            ViewBag.ShoppingListId = id;
+            var productList = GetListDetails(id);
 
             return View(productList.ToList());
         }
@@ -255,10 +241,46 @@ namespace ShoppingListApp.Controllers
             }
         }
 
-        public IActionResult Shop()
+        [Route("{listId:int}")]
+        public IActionResult Shop(int listId)
         {
-            //TODO Shop
-            return View();
+            ViewBag.ListName = context.ShoppingLists.Find(listId).ShoppingListName;
+
+            var shoppingList = GetListDetails(listId);
+            HttpContext.Session.SetObject("ShoppingList", shoppingList);
+
+            return View(shoppingList);
+        }
+
+        [HttpPost]
+        [Route("{listId:int}/{productId:int}")]
+        [ActionName(nameof(Shop))]
+        public IActionResult ShopUpdate(int listId, int productId)
+        {
+            var shoppingList = HttpContext.Session.GetObject<List<ShoppingListViewModel>>("ShoppingList");
+            var productToRemove = shoppingList.Where(a => a.ShoppingListId == listId && a.ProductId == productId).Single();
+            shoppingList.Remove(productToRemove);
+            return View(shoppingList);
+        }
+
+        private List<ShoppingListViewModel> GetListDetails(int id)
+        {
+            var productList = from d in context.ShoppingListDetails
+                              join p in context.Products
+                              on d.ProductId equals p.ProductId
+                              into listDetails
+                              from ld in listDetails.DefaultIfEmpty()
+                              where d.ShoppingListId == id
+                              select new ShoppingListViewModel
+                              {
+                                  ProductId = ld.ProductId,
+                                  Image = ld.Image,
+                                  Name = ld.Name,
+                                  Quantity = d.Quantity,
+                                  Notes = d.Note
+                              };
+
+            return productList.ToList();
         }
 
         private void GenerateProductSelectListViewBag()

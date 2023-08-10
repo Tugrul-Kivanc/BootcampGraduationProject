@@ -1,0 +1,51 @@
+﻿@model IEnumerable<ShoppingListViewModel>
+
+@{
+    ViewData["Title"] = "Shopping: " + @ViewBag.ListName;
+}
+
+<h1>Shopping: @ViewBag.ListName</h1>
+
+<hr />
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Product")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Notes)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@item.Image" alt="@item.Name" width="50" height="50">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    <form asp-action="ShopUpdate">
+                        <input type="submit" value="Bought" class="btn btn-primary" asp-route-listId="@item.ShoppingListId" asp-route-productId="@item.ProductId" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="ListDetails" asp-route-id="@ViewContext.RouteData.Values["listId"]" class="btn btn-primary">Finish Shopping</a>
+</div>
