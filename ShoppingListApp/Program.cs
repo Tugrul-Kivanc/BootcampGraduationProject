@@ -18,7 +18,7 @@ app.UseSession();
 app.MapControllers();
 app.MapGet("", context =>
 {
-    return Task.Run(() => context.Response.Redirect("/Login/Index"));
+    return Task.Run(() => context.Response.Redirect("/Login"));
 });
 
 app.Run();
