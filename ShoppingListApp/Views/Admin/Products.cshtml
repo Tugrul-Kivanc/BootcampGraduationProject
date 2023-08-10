@@ -43,8 +43,8 @@
                 <img src="@item.Image" alt="@item.Name" width="50" height="50">
             </td>
             <td>
-                <a asp-action="EditProduct" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="DeleteProduct" asp-route-id="@item.ProductId">Delete</a>
+                    <a asp-action="EditProduct" asp-route-id="@item.ProductId" class="btn btn-primary">Edit</a> 
+                    <a asp-action="DeleteProduct" asp-route-id="@item.ProductId" class="btn btn-primary">Delete</a>
             </td>
         </tr>
 }
@@ -54,3 +54,7 @@
 @Html.PagedListPager((IPagedList)Model,
                     page => Url.Action("Products", new {page}),
                     new PagedListRenderOptions(){DisplayLinkToFirstPage = PagedListDisplayMode.Always})
+
+<div>
+    <a asp-action="Panel">Back to Panel</a>
+</div>

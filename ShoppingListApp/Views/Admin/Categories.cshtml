@@ -31,8 +31,8 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="EditCategory" asp-route-id="@item.CategoryId">Edit</a> |
-                <a asp-action="DeleteCategory" asp-route-id="@item.CategoryId">Delete</a>
+                    <a asp-action="EditCategory" asp-route-id="@item.CategoryId" class="btn btn-primary">Edit</a>
+                    <a asp-action="DeleteCategory" asp-route-id="@item.CategoryId" class="btn btn-primary">Delete</a>
             </td>
         </tr>
 }
@@ -42,3 +42,7 @@
 @Html.PagedListPager((IPagedList)Model,
                     page => Url.Action("Categories", new {page}),
                     new PagedListRenderOptions(){DisplayLinkToFirstPage = PagedListDisplayMode.Always})
+
+<div>
+    <a asp-action="Panel">Back to Panel</a>
+</div>

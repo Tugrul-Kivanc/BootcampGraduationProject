@@ -6,7 +6,8 @@
 
 <h1>@ViewBag.ListName</h1>
 <p>
-    <a asp-action="AddProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]">Add a Product</a>
+    <a asp-action="AddProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]">Add a Product</a> |
+    <a asp-action="Shop" asp-route-listId="@ViewContext.RouteData.Values["id"]">Start Shopping</a>
 </p>
 <hr />
 <table class="table table-bordered">
@@ -38,8 +39,8 @@
                 @Html.DisplayFor(modelItem => item.Notes)
             </td>
             <td>
-                <a asp-action="EditProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId">Edit</a> |
-                <a asp-action="RemoveProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId">Delete</a>
+                    <a asp-action="EditProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId" class="btn btn-primary">Edit</a> 
+                    <a asp-action="RemoveProduct" asp-route-listId="@ViewContext.RouteData.Values["id"]" asp-route-productId="@item.ProductId" class="btn btn-primary">Delete</a>
             </td>
         </tr>
 }
