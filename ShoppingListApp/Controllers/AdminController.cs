@@ -22,21 +22,7 @@ namespace ShoppingListApp.Controllers
 
         public IActionResult Products()
         {
-            var products = from p in context.Products
-                        join c in context.Categories
-                        on p.CategoryId equals c.CategoryId
-                        into productCategory
-                        from pc in productCategory
-                        select new ProductViewModel
-                        {
-                            ProductId = p.ProductId,
-                            CategoryId = pc.CategoryId,
-                            CategoryName = pc.Name,
-                            Name = p.Name,
-                            Image = p.Image
-                        };
-
-            return View(products.ToList());
+            return View(GetProducts().ToList());
         }
 
         public IActionResult CreateCategory()
@@ -183,17 +169,18 @@ namespace ShoppingListApp.Controllers
         [Route("{id:int}")]
         public IActionResult EditProduct(int id)
         {
-            var product = context.Products.Find(id);
+            GenerateCategorySelectListViewBag();
+
+            var product = GetProducts().Where(a => a.ProductId == id).Single();
             if (product == null)
                 return RedirectToAction(nameof(Products));
 
-            GenerateCategorySelectListViewBag();
             return View(product);
         }
 
         [HttpPost]
         [Route("{id:int}")]
-        public IActionResult EditProduct(int id, Product productToEdit) // TODO Show current values
+        public IActionResult EditProduct(int id, ProductViewModel productToEdit) // TODO Show current values
         {
             GenerateCategorySelectListViewBag();
             try
@@ -217,7 +204,6 @@ namespace ShoppingListApp.Controllers
             }
             catch (Exception)
             {
-                // TODO display error message or prevent input
                 return View();
             }
         }
@@ -270,6 +256,25 @@ namespace ShoppingListApp.Controllers
             query.ForEach(a => selectList.Add(new SelectListItem() { Text = a.Name, Value = a.CategoryId.ToString() }));
 
             ViewBag.Categories = selectList;
+        }
+
+        private IQueryable<ProductViewModel> GetProducts()
+        {
+            var products = from p in context.Products
+                           join c in context.Categories
+                           on p.CategoryId equals c.CategoryId
+                           into productCategory
+                           from pc in productCategory
+                           select new ProductViewModel
+                           {
+                               ProductId = p.ProductId,
+                               CategoryId = pc.CategoryId,
+                               CategoryName = pc.Name,
+                               Name = p.Name,
+                               Image = p.Image
+                           };
+
+            return products;
         }
     }
 }
