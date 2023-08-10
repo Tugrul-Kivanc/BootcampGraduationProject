@@ -21,7 +21,7 @@
                     <a asp-action="ListDetails" asp-route-id="@item.ShoppingListId">Details</a> |
                     <a asp-action="EditList" asp-route-id="@item.ShoppingListId">Rename</a> |
                     <a asp-action="DeleteList" asp-route-id="@item.ShoppingListId">Delete</a> |
-                    <a asp-action="Shop" asp-route-id="@item.ShoppingListId">Start Shopping</a>
+                    <a asp-action="Shop" asp-route-listId="@item.ShoppingListId">Start Shopping</a>
                 </td>
             </tr>
         }
