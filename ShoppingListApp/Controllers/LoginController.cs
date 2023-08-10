@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ShoppingListApp.Extensions;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
 
@@ -31,6 +32,8 @@ namespace ShoppingListApp.Controllers
                     ModelState.AddModelError("Password", "Wrong password.");
                     return View(model);
                 }
+
+                HttpContext.Session.SetObject("User", user);
 
                 return RedirectToAction("List", "ShoppingList", new { id = user.UserId });
             }

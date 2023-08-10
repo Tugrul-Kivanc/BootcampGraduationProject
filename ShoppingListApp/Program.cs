@@ -4,9 +4,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSession();
-builder.Services.AddFluentValidation(
-    a => a.RegisterValidatorsFromAssemblyContaining<Program>());
+builder.Services.AddSession( options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+});
+builder.Services.AddFluentValidation( options =>
+    options.RegisterValidatorsFromAssemblyContaining<Program>());
 
 var app = builder.Build();
 

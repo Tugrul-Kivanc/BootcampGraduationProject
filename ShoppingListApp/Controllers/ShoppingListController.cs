@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ShoppingListApp.Extensions;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
 using System.Collections.Generic;
@@ -12,10 +13,16 @@ namespace ShoppingListApp.Controllers
     [Route("[controller]/[action]")]
     public class ShoppingListController : ControllerBase
     {
-        [Route("{id:int}")]
-        public IActionResult List(int id) // Takes User Id
+        public IActionResult List()
         {
-            var shoppingLists = context.ShoppingLists.Where(a => a.UserId == id);
+            User user;
+            if(!TryGetUserFromSession(out user))
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login", "Login");
+            }
+
+            var shoppingLists = context.ShoppingLists.Where(a => a.UserId == user.UserId);
             return View(shoppingLists.ToList());
         }
 
@@ -42,22 +49,27 @@ namespace ShoppingListApp.Controllers
             return View(productList.ToList());
         }
 
-        [Route("{id:int}")]
-        public IActionResult CreateList(int id) //Takes user id
+        public IActionResult CreateList()
         {
             return View();
         }
 
         [HttpPost]
-        [Route("{id:int}")]
-        public IActionResult CreateList(int id, ShoppingList listToCreate) //Takes user id
+        public IActionResult CreateList(ShoppingList listToCreate)
         {
+            User user;
+            if (!TryGetUserFromSession(out user))
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login", "Login");
+            }
+
             try
             {
                 ShoppingList shoppingList = new ShoppingList()
                 {
                     ShoppingListName = listToCreate.ShoppingListName,
-                    UserId = id
+                    UserId = user.UserId
                 };
 
                 context.ShoppingLists.Add(shoppingList);
@@ -65,7 +77,7 @@ namespace ShoppingListApp.Controllers
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
-                return RedirectToAction(nameof(List), new { id = id });
+                return RedirectToAction(nameof(List));
             }
             catch (Exception)
             {
@@ -79,7 +91,7 @@ namespace ShoppingListApp.Controllers
             var shoppingList = context.ShoppingLists.Find(id);
 
             if (shoppingList == null)
-                return RedirectToAction(nameof(List), new { id = 1 }); // TODO redirect with user session
+                return RedirectToAction(nameof(List)); // TODO redirect with user session
 
             return View(shoppingList);
         }
@@ -97,7 +109,7 @@ namespace ShoppingListApp.Controllers
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
 
-                return RedirectToAction(nameof(List), new { id = 1 }); //TODO redirect with user session
+                return RedirectToAction(nameof(List)); //TODO redirect with user session
             }
             catch (Exception)
             {
@@ -111,7 +123,7 @@ namespace ShoppingListApp.Controllers
             var shoppingListToDelete = context.ShoppingLists.Find(id);
 
             if (shoppingListToDelete == null)
-                return RedirectToAction(nameof(List), new { id = 1 }); //TODO change id to take userid. Probably use session
+                return RedirectToAction(nameof(List)); //TODO change id to take userid. Probably use session
 
             return View(shoppingListToDelete);
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ShoppingListApp.Extensions;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
 
@@ -11,6 +12,17 @@ namespace ShoppingListApp.Controllers
     {
         public IActionResult Panel()
         {
+            User? user;
+            if(!TryGetUserFromSession(out user))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            if (!user.IsAdmin)
+            {
+                return RedirectToAction("List", "ShoppingList");
+            }
+
             return View();
         }
 
@@ -80,7 +92,7 @@ namespace ShoppingListApp.Controllers
 
                 var category = context.Categories.Where(a => a.CategoryId == id).SingleOrDefault();
                 category.Name = categoryToEdit.Name;
-                
+
                 var result = context.SaveChanges();
                 if (result == 0)
                     throw new Exception("No changes were made to the database");
@@ -140,12 +152,6 @@ namespace ShoppingListApp.Controllers
             GenerateCategorySelectListViewBag();
             try
             {
-                var isDuplicateName = context.Products.Where(a => a.Name == productToAdd.Name).Count() > 0;
-                var isSameCategory = context.Products.Where(a => a.CategoryId == productToAdd.CategoryId).Count() > 0;
-
-                if (isDuplicateName && isSameCategory)
-                    return RedirectToAction(nameof(Products));
-
                 Product product = new Product()
                 {
                     CategoryId = productToAdd.CategoryId,
@@ -185,12 +191,6 @@ namespace ShoppingListApp.Controllers
             GenerateCategorySelectListViewBag();
             try
             {
-                var isDuplicateName = context.Products.Where(a => a.Name == productToEdit.Name).Count() > 0;
-                var isSameCategory = context.Products.Where(a => a.CategoryId == productToEdit.CategoryId).Count() > 0;
-
-                if (isDuplicateName && isSameCategory)
-                    return RedirectToAction(nameof(Products));
-
                 var product = context.Products.Where(a => a.ProductId == id).SingleOrDefault();
                 product.CategoryId = productToEdit.CategoryId;
                 product.Name = productToEdit.Name;

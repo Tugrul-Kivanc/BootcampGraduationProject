@@ -35,6 +35,6 @@
         <input type="hidden" asp-for="ProductId" value="@ViewContext.RouteData.Values["productId"]" />
         <input type="hidden" asp-for="ShoppingListId" value="@ViewContext.RouteData.Values["listId"]" />
         <input type="submit" value="Remove" class="btn btn-danger" /> |
-        <a asp-action="ListDetails">Back to List</a>
+        <a asp-action="ListDetails" asp-route-id="@ViewContext.RouteData.Values["listId"]">Back to List</a>
     </form>
 </div>
