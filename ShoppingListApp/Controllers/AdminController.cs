@@ -4,12 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using ShoppingListApp.Extensions;
 using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
+using X.PagedList;
 
 namespace ShoppingListApp.Controllers
 {
     [Route("[controller]/[action]")]
     public class AdminController : ControllerBase
     {
+        private int pageSize = 10;
+
         public IActionResult Panel()
         {
             User? user;
@@ -26,15 +29,16 @@ namespace ShoppingListApp.Controllers
             return View();
         }
 
-        public IActionResult Categories()
+        public IActionResult Categories(int page = 1)
         {
-            var query = context.Categories;
-            return View(query.ToList());
+            var categories = context.Categories.ToPagedList(page, pageSize);
+            return View(categories);
         }
 
-        public IActionResult Products()
+        public IActionResult Products(int page = 1)
         {
-            return View(GetProducts().ToList());
+            var products = GetProducts().ToPagedList(page, pageSize);
+            return View(products);
         }
 
         public IActionResult CreateCategory()

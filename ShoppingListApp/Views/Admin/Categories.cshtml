@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ShoppingListModel.Models.Category>
+﻿@model IPagedList<Category>
 
 @{
     ViewData["Title"] = "Categories";
@@ -13,10 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
+                @Html.DisplayName("Category Id")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayName("Name")
             </th>
             <th></th>
         </tr>
@@ -24,9 +24,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CategoryId)
-                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryId)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
@@ -38,3 +38,7 @@
 }
     </tbody>
 </table>
+
+@Html.PagedListPager((IPagedList)Model,
+                    page => Url.Action("Categories", new {page}),
+                    new PagedListRenderOptions(){DisplayLinkToFirstPage = PagedListDisplayMode.Always})
