@@ -1,3 +1,17 @@
-﻿<a asp-area="" asp-controller="Admin" asp-action="Categories">Categories</a>
-<hr />
-<a asp-area="" asp-controller="Admin" asp-action="Products">Products</a>
+﻿<div class="row">
+	<div class="column">
+		<a asp-area="" asp-controller="Admin" asp-action="Categories">Categories</a>
+	</div>
+	<div class="column">
+		<a asp-area="" asp-controller="Admin" asp-action="Products">Products</a>
+	</div>
+</div>
+
+<style>
+	.column {
+		float: left;
+		width: 50%;
+		padding: 10px;
+		text-align: center;
+	}
+</style>
