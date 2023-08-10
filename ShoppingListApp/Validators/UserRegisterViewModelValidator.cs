@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
+using ShoppingListApp.ViewModels;
 using ShoppingListModel.Models;
 
 namespace ShoppingListApp.Validators
 {
-    public class UserValidator : AbstractValidator<User>
+    public class UserRegisterViewModelValidator : AbstractValidator<UserRegisterViewModel>
     {
-        public UserValidator()
+        public UserRegisterViewModelValidator()
         {
             RuleFor(a => a.Name)
                 .NotNull().WithMessage("Name is required")
@@ -22,8 +23,7 @@ namespace ShoppingListApp.Validators
                 .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$").WithMessage("Password should contain at least one upper case letter, one lower case letter and a number.");
 
             RuleFor(a => a.ConfirmPassword)
-                .NotNull().WithMessage("Password is required")
-                .Matches(a => a.Password).WithMessage("Passwords do not match");
+                .NotNull().WithMessage("Password is required");
         }
     }
 }
