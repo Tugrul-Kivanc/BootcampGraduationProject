@@ -15,6 +15,7 @@ namespace ShoppingListApp.Controllers
 
         public IActionResult Panel()
         {
+            // TODO apply authentication to every action
             User? user;
             if(!TryGetUserFromSession(out user))
             {
