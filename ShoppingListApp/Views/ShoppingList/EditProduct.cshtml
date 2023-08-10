@@ -33,7 +33,7 @@
 </div>
 
 <div>
-    <a asp-action="ListDetails">Back to List</a>
+    <a asp-action="ListDetails" asp-route-id="@ViewContext.RouteData.Values["listId"]">Back to List</a>
 </div>
 
 @section Scripts

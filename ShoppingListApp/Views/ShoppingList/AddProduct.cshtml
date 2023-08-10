@@ -37,8 +37,7 @@
 </div>
 
 <div>
-    @*TODO return to list with its id*@
-    <a asp-action="ListDetails">Back to List</a>
+    <a asp-action="ListDetails" asp-route-id="@Url.ActionContext.RouteData.Values["listId"]">Back to List</a>
 </div>
 
 @section Scripts
